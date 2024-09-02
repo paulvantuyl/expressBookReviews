@@ -18,10 +18,7 @@ let books = {
             "author": "Unknown",
             "title": "The Epic Of Gilgamesh",
             "reviews": {
-                  1: {
-                        "author": "classic reader 23",
-                        "review": "This is a must read IMO"
-                  }
+                  "user12": "This is a must read IMO"
             }
       },
       5: {
