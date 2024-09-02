@@ -8,12 +8,14 @@ const PORT = 5000;
 
 app.use(express.json());
 
+// Initialize session middleware with options
 app.use('/customer', session({
     secret: 'fingerprint_customer', 
     resave: true,
     saveUninitialized: true
 }));
 
+// Middleware for user authentication
 app.use('/customer/auth/*', function auth(req, res, next) {
     if (req.session.authorization) {
         let token = req.session.authorization['accessToken'];
