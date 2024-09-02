@@ -29,10 +29,10 @@ public_users.get('/', (req, res) => {
 // Get book details based on ISBN
 public_users.get('/isbn/:isbn', (req, res) => {
 	const isbn = req.params.isbn;
-	let book = books[isbn];
+	let filtered_book = books[isbn];
 
-	if (book) {
-		res.send(book);
+	if (filtered_book) {
+		res.send(filtered_book);
 	} else {
 		res.send(`Can't find a book with the ISBN "${isbn}".`);
 	}	
@@ -77,12 +77,13 @@ public_users.get('/title/:title',function (req, res) {
 //  Get book review
 public_users.get('/review/:isbn',function (req, res) {
 	const isbn = req.params.isbn;
-    let book = books[isbn];
+    let filtered_book = books[isbn];
+	var count = Object.keys(filtered_book['reviews']).length;
 
-    if (book) {
-        res.send(book);
+    if (count >= 1) {
+        res.send(filtered_book['reviews']);
     } else {
-        res.send(`Can't find reviews for a book with the ISBN "${isbn}".`);
+        res.send(`Can't find any reviews for a book with the ISBN "${isbn}".`);
     }	
 });
 
