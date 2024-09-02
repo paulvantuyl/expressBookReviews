@@ -58,13 +58,30 @@ regd_users.post('/login', (req, res) => {
 	} else {
 		return res.status(208).json({ message: 'Invalid login. Check username and password.' });
 	}
-	// return res.status(300).json({ message: "Yet to be implemented" });
 });
 
-// Add a book review
-regd_users.put("/auth/review/:isbn", (req, res) => {
-	//Write your code here
-	return res.status(300).json({message: "Yet to be implemented"});
+// Add or update a review as auth users
+// Route due to middleware _should_ be /customer/auth/review/:isbn
+// In Postman, set up the Params to be 
+// Key: review
+// Value: The actual review to be added
+regd_users.put('/auth/review/:isbn', (req, res) => {
+	const isbn = req.params.isbn;
+	let filtered_book = books[isbn];	
+
+	if (filtered_book) {
+		let user_review = req.query.review;
+		let reviewer = req.session.authorization['username'];
+	
+		if (user_review) { // Is there an exisiting review?
+			filtered_book['reviews'][reviewer] = user_review;
+			books[isbn] = filtered_book;
+		}
+		res.send(`The review for book ISBN ${isbn} has been added or updated.`);
+
+	} else {
+		res.send(`Unable to find a book with ISBN ${isbn}.`);
+	}	
 });
 
 module.exports.authenticated = regd_users;
