@@ -84,6 +84,19 @@ regd_users.put('/auth/review/:isbn', (req, res) => {
 	}	
 });
 
+// Delete a review based on auth users
+// Route due to middleware is /customer/auth/review/:isbn
+regd_users.delete('/auth/review/:isbn', (req, res) => {
+	const isbn = req.params.isbn;
+	let filtered_book = books[isbn];
+	let reviewer = req.session.authorization['username'];
+
+	if (filtered_book) {
+		delete books[isbn]['reviews'][reviewer];
+		res.send(`Any reviews by ${reviewer} for ISBN ${isbn} have been deleted.`);
+	}
+});
+
 module.exports.authenticated = regd_users;
 module.exports.isValid = isValid;
 module.exports.users = users;
