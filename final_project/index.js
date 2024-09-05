@@ -1,12 +1,15 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
-const session = require('express-session')
+const session = require('express-session');
+
 const customer_routes = require('./router/auth_users.js').authenticated;
 const genl_routes = require('./router/general.js').general;
 const port = require('./router/general.js').port;
-const app = express();
-// const PORT = 5000;
 
+const app = express();
+
+
+// Middleware to parse incoming requests with JSON payloads
 app.use(express.json());
 
 // Initialize session middleware with options

@@ -1,8 +1,14 @@
 const express = require('express');
+const axios = require('axios');
+
 let books = require("./booksdb.js");
 let isValid = require("./auth_users.js").isValid;
 let users = require("./auth_users.js").users;
+
 const public_users = express.Router();
+const PORT = 5000;
+
+let baseURL = `http://127.0.0.1:${PORT}/`;
 
 
 public_users.post('/register', (req, res) => {
@@ -22,9 +28,37 @@ public_users.post('/register', (req, res) => {
 });
 
 // Get the book list available in the shop
+// Non-promise method
+// public_users.get('/', (req, res) => {
+// 	res.send(JSON.stringify(books, null, 4));
+// });
+
 public_users.get('/', (req, res) => {
-	res.send(JSON.stringify(books, null, 4));
+	const getBooks = new Promise((resolve, reject) => {
+		setTimeout(() => {
+			try {
+				const data = res.send(JSON.stringify(books, null, 4));
+				resolve(data);
+				console.log('Promise for task 10 resolved.');
+			} catch(err) {
+				reject(err)
+			}
+		}, 500);
+	});
 });
+
+// Axios method that's freaking out over localhost
+// public_users.get('/', (req, res) => {
+// 	axios.get(baseURL)
+// 		.then(response => {
+// 			res.send(JSON.stringify(response.data.books, null, 4));
+// 			console.log('Promise for task 10 resolved');
+// 		})
+// 		.catch(error => {
+// 			console.error('Error fetching books:', error);
+// 			res.status(500).send('Error getting books. Bummer.');
+// 		});
+// });
 
 // Get book details based on ISBN
 public_users.get('/isbn/:isbn', (req, res) => {
@@ -88,3 +122,4 @@ public_users.get('/review/:isbn',function (req, res) {
 });
 
 module.exports.general = public_users;
+module.exports.port = PORT;
