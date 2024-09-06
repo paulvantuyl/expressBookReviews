@@ -36,15 +36,13 @@ public_users.post('/register', (req, res) => {
 // Promise-based router
 public_users.get('/', (req, res) => {
 	const getBooks = new Promise((resolve, reject) => {
-		setTimeout(() => {
-			try {
-				const data = res.send(JSON.stringify(books, null, 4));
-				resolve(data);
-				console.log('Promise for task 10 resolved.');
-			} catch(error) {
-				reject(error);
-			}
-		}, 100);
+		try {
+			const data = res.send(JSON.stringify(books, null, 4));
+			resolve(data);
+			console.log('Promise for task 10 resolved.');
+		} catch(error) {
+			reject(error);
+		}
 	});
 });
 
@@ -67,12 +65,12 @@ public_users.get('/isbn/:isbn', (req, res) => {
 	const getBooksByISBN = new Promise((resolve, reject) => {
 		const isbn = req.params.isbn;
 		let filtered_book = books[isbn];
-		
+
 		try {
 			if (filtered_book) {
 				const data = res.send(filtered_book);
 				resolve (data);
-			} if (!filtered_book) {
+			} else if (!filtered_book) {
 				const unfound = res.status(400).send(`Can't find a book with the ISBN "${isbn}".`);
 				resolve (unfound);
 			}
@@ -84,21 +82,54 @@ public_users.get('/isbn/:isbn', (req, res) => {
 });
 	
 // Get book details based on author
-public_users.get('/author/:author', (req, res) => {
-	const author = req.params.author;
-	let books_by_author = [];
-	let isbns = Object.keys(books);
+// Non-promise router
+// public_users.get('/author/:author', (req, res) => {
+// 	const author = req.params.author;
+// 	let books_by_author = [];
+// 	let isbns = Object.keys(books);
 
-	isbns.forEach((isbn) => {
-		if(books[isbn]["author"] === author) {
-			books_by_author.push({
-				"isbn": isbn,
-                "title": books[isbn]["title"],
-                "reviews": books[isbn]["reviews"]
+// 	isbns.forEach((isbn) => {
+// 		if(books[isbn]["author"] === author) {
+// 			books_by_author.push({
+// 				"isbn": isbn,
+//                 "title": books[isbn]["title"],
+//                 "reviews": books[isbn]["reviews"]
+// 			});
+// 		}
+// 	});
+// 	res.send(JSON.stringify({books_by_author}, null, 4));
+// });
+
+// Promise-based author router
+public_users.get('/author/:author', (req, res) => {
+	(new Promise((resolve, reject) => {
+		const author = req.params.author;
+		let books_by_author = [];
+		let isbns = Object.keys(books);
+
+		try {
+			isbns.forEach((isbn) => {
+				let author_match = books[isbn]['author'];
+
+				if (author_match === author) {
+					books_by_author.push({
+						"isbn": isbn,
+						"title": books[isbn]["title"],
+						"reviews": books[isbn]["reviews"]
+					});
+					const data = res.send(JSON.stringify({books_by_author}, null, 4));
+					resolve (data);
+				}
+				// If statement getting skipped entirely
+				else if (author_match !== author) {
+					const unfound = res.status(404).send(`Can't find any books by "${author}".`);
+					resolve (unfound);
+				}
 			});
+		} catch (error) {
+			reject (error);
 		}
-	});
-	res.send(JSON.stringify({books_by_author}, null, 4));
+	}));
 });
 
 // Get all books based on title
