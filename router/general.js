@@ -28,12 +28,6 @@ public_users.post('/register', (req, res) => {
 });
 
 // Get the book list available in the shop
-// Non-promise router
-// public_users.get('/', (req, res) => {
-// 	res.send(JSON.stringify(books, null, 4));
-// });
-
-// Promise-based router
 public_users.get('/', (req, res) => {
 	(new Promise((resolve, reject) => {
 		try {
@@ -47,20 +41,6 @@ public_users.get('/', (req, res) => {
 });
 
 // Get book details based on ISBN
-// Non-promise router
-// public_users.get('/isbn/:isbn', (req, res) => {
-// 	const isbn = req.params.isbn;
-// 	let filtered_book = books[isbn];
-
-// 	if (filtered_book) {
-// 		res.send(filtered_book);
-// 	} else {
-// 		res.send(`Can't find a book with the ISBN "${isbn}".`);
-// 	}
-//  });
-
-// Promise-based ISBN router
-// has the code for getting the book details based on ISBN using Promise callbacks
 public_users.get('/isbn/:isbn', (req, res) => {
 	(new Promise((resolve, reject) => {
 		const isbn = req.params.isbn;
@@ -82,25 +62,6 @@ public_users.get('/isbn/:isbn', (req, res) => {
 });
 	
 // Get book details based on author
-// Non-promise router
-// public_users.get('/author/:author', (req, res) => {
-// 	const author = req.params.author;
-// 	let books_by_author = [];
-// 	let isbns = Object.keys(books);
-
-// 	isbns.forEach((isbn) => {
-// 		if(books[isbn]["author"] === author) {
-// 			books_by_author.push({
-// 				"isbn": isbn,
-//                 "title": books[isbn]["title"],
-//                 "reviews": books[isbn]["reviews"]
-// 			});
-// 		}
-// 	});
-// 	res.send(JSON.stringify({books_by_author}, null, 4));
-// });
-
-// Promise-based author router
 public_users.get('/author/:author', (req, res) => {
 	(new Promise((resolve, reject) => {
 		const author = req.params.author;
@@ -143,24 +104,6 @@ public_users.get('/author/:author', (req, res) => {
 });
 
 // Get all books based on title
-// Non promise-based router
-// public_users.get('/title/:title',function (req, res) {
-// 	const title = req.params.title;
-// 	let books_by_title = [];
-// 	let isbns = Object.keys(books);
-
-// 	isbns.forEach((isbn) => {
-// 		if(books[isbn]["title"] === title) {
-// 			books_by_title.push({
-//                 isbn: isbn,
-//                 author: books[isbn]["author"],
-//                 reviews: books[isbn]["reviews"],
-//             });
-// 		}	
-// 	});
-// 	res.send(JSON.stringify({books_by_title}, null, 4));
-// });
-// Promise-based router to get all books based on title
 public_users.get("/title/:title", function (req, res) {
 	(new Promise((resolve, reject) => {
 		const title = req.params.title;
