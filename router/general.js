@@ -35,7 +35,7 @@ public_users.post('/register', (req, res) => {
 
 // Promise-based router
 public_users.get('/', (req, res) => {
-	const getBooks = new Promise((resolve, reject) => {
+	(new Promise((resolve, reject) => {
 		try {
 			const data = res.send(JSON.stringify(books, null, 4));
 			resolve(data);
@@ -43,7 +43,7 @@ public_users.get('/', (req, res) => {
 		} catch(error) {
 			reject(error);
 		}
-	});
+	}));
 });
 
 // Get book details based on ISBN
@@ -62,7 +62,7 @@ public_users.get('/', (req, res) => {
 // Promise-based ISBN router
 // has the code for getting the book details based on ISBN using Promise callbacks
 public_users.get('/isbn/:isbn', (req, res) => {
-	const getBooksByISBN = new Promise((resolve, reject) => {
+	(new Promise((resolve, reject) => {
 		const isbn = req.params.isbn;
 		let filtered_book = books[isbn];
 
@@ -78,7 +78,7 @@ public_users.get('/isbn/:isbn', (req, res) => {
 		} catch (error) {
 			reject(error);
 		}		
-	});
+	}));
 });
 	
 // Get book details based on author
@@ -109,23 +109,31 @@ public_users.get('/author/:author', (req, res) => {
 
 		try {
 			isbns.forEach((isbn) => {
-				let author_match = books[isbn]['author'];
-
+				// var for the author in db/json
+				let author_match = books[isbn]["author"];
+				
+				// match db to req param
 				if (author_match === author) {
 					books_by_author.push({
 						"isbn": isbn,
 						"title": books[isbn]["title"],
 						"reviews": books[isbn]["reviews"]
 					});
-					const data = res.send(JSON.stringify({books_by_author}, null, 4));
-					resolve (data);
-				}
-				// If statement getting skipped entirely
-				else if (author_match !== author) {
-					const unfound = res.status(404).send(`Can't find any books by "${author}".`);
-					resolve (unfound);
-				}
+					// If the new array has results, send response
+					if (books_by_author.length >= 1) {
+						const data = res.send(JSON.stringify({books_by_author}, null, 4));
+						resolve (data);
+					}
+				} 
 			});
+
+			// If the new array has no results, send 404
+			if (books_by_author.length < 1) {
+                const unfound = res
+                    .status(404)
+                    .send(`Can't find any books by "${author}".`);
+                resolve(unfound);
+            }
 		} catch (error) {
 			reject (error);
 		}
