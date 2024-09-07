@@ -121,7 +121,9 @@ public_users.get('/author/:author', (req, res) => {
 					});
 					// If the new array has results, send response
 					if (books_by_author.length >= 1) {
-						const data = res.send(JSON.stringify({books_by_author}, null, 4));
+						const data = res.send(
+							JSON.stringify({ books_by_author }, null, 4)
+						);
 						resolve (data);
 					}
 				} 
@@ -141,21 +143,63 @@ public_users.get('/author/:author', (req, res) => {
 });
 
 // Get all books based on title
-public_users.get('/title/:title',function (req, res) {
-	const title = req.params.title;
-	let books_by_title = [];
-	let isbns = Object.keys(books);
+// Non promise-based router
+// public_users.get('/title/:title',function (req, res) {
+// 	const title = req.params.title;
+// 	let books_by_title = [];
+// 	let isbns = Object.keys(books);
 
-	isbns.forEach((isbn) => {
-		if(books[isbn]["title"] === title) {
-			books_by_title.push({
-                isbn: isbn,
-                author: books[isbn]["author"],
-                reviews: books[isbn]["reviews"],
-            });
-		}	
-	});
-	res.send(JSON.stringify({books_by_title}, null, 4));
+// 	isbns.forEach((isbn) => {
+// 		if(books[isbn]["title"] === title) {
+// 			books_by_title.push({
+//                 isbn: isbn,
+//                 author: books[isbn]["author"],
+//                 reviews: books[isbn]["reviews"],
+//             });
+// 		}	
+// 	});
+// 	res.send(JSON.stringify({books_by_title}, null, 4));
+// });
+// Promise-based router to get all books based on title
+public_users.get("/title/:title", function (req, res) {
+	(new Promise((resolve, reject) => {
+		const title = req.params.title;
+        let books_by_title = [];
+        let isbns = Object.keys(books);
+
+		try {
+			isbns.forEach((isbn) => {
+				// var for the title in db/json
+				let title_match = books[isbn]["title"];
+
+				// match db to req params
+				if (title_match === title) {
+					books_by_title.push({
+						isbn: isbn,
+						author: books[isbn]["author"],
+						reviews: books[isbn]["reviews"],
+					});
+					// If new array has results, send response
+					if (books_by_title.length >= 1) {
+						const data = res.send(
+                            JSON.stringify({ books_by_title }, null, 4)
+                        );
+						resolve (data);
+					} 
+				}
+			});
+
+			// If the new array has no results, send 404
+			if (books_by_title < 1) {
+				const unfound = res
+					.status(404)
+					.send(`Can't find any books with the title "${title}".`);
+				resolve (unfound);
+			}
+		} catch (error) {
+			reject (error);
+		}
+	}));
 });
 
 //  Get book review
